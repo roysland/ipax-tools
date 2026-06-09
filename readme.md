@@ -1,6 +1,6 @@
 # ipax-cli
 
-** This entire repository is based on the brilliant work of Santiago Bustelo
+** This entire repository is based on the brilliant work of Santiago Bustelo**
 - Website: https://www.bustelo.com.ar/
 - Source: https://icograma.com/index.php
 
