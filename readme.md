@@ -1,8 +1,8 @@
 # ipax-cli
 
 ** This entire repository is based on the brilliant work of Santiago Bustelo
-Website: https://www.bustelo.com.ar/
-Source: https://icograma.com/index.php
+- Website: https://www.bustelo.com.ar/
+- Source: https://icograma.com/index.php
 
 A command-line tool that scores color pairs for accessibility and visual comfort. It goes beyond standard contrast ratios by factoring in how human vision actually experiences color — so a pair that passes the legal accessibility threshold can still score poorly if it causes eye strain.
 
