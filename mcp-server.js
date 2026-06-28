@@ -22,7 +22,7 @@ function runCLI(args) {
 const TOOLS = [
     {
         name: 'ipax_evaluate',
-        description: 'Evaluate the perceptual contrast between a background and text color pair. Returns an IPAX score (0–5), APCA Lc, WCAG ratio, font sizing, active perceptual penalties (chromostereopsis, halation, glare, etc.) and rewards.',
+        description: 'Evaluate the perceptual contrast between a background and text color pair. Returns an IPAX score (0-5), APCA Lc, WCAG ratio, font sizing, active perceptual penalties (chromostereopsis, halation, glare, etc.) and rewards.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -30,7 +30,7 @@ const TOOLS = [
                 text: { type: 'string', description: 'Text (foreground) color — same formats as background.' },
                 mode: { type: 'string', enum: ['text', 'graphical'], description: 'Scoring mode. "text" (default) uses APCA font sizing; "graphical" uses WCAG 1.4.11 non-text contrast.' },
                 context: { type: 'string', enum: ['light', 'dark'], description: 'Force light or dark context. Omit to auto-detect from background lightness.' },
-                weight: { type: 'number', description: 'Font weight for APCA minimum size lookup (100–900, default 400).' },
+                weight: { type: 'number', description: 'Font weight for APCA minimum size lookup (100-900, default 400).' },
                 flatten_over: { type: 'string', description: 'Composite semi-transparent rgba() colors over this opaque color before scoring.' },
             },
             required: ['background', 'text'],
@@ -42,7 +42,7 @@ const TOOLS = [
         inputSchema: {
             type: 'object',
             properties: {
-                hue: { type: 'number', description: 'Target hue angle in degrees (0–360).' },
+                hue: { type: 'number', description: 'Target hue angle in degrees (0-360).' },
                 base: { type: 'string', description: 'Bias color-mix() hints toward this existing color.' },
                 target: { type: 'number', description: 'Minimum IPAX score to include in results (default 3).' },
                 count: { type: 'number', description: 'Number of results to return (default 3).' },
