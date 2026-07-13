@@ -511,9 +511,9 @@ The `string` field in JSON output encodes compliance at a glance:
 | `3` | IPAX 3 |
 | `X` | IPAX < 1, compliance also fails |
 | `X(1)` | IPAX < 1, but WCAG score is 1 — ergonomics dragged it below the compliance floor |
-| `3(2)` | IPAX 3, WCAG is 2 — APCA drives the score above what WCAG alone would allow |
+| `2(3)` | IPAX 2, but WCAG score is 3 — ergonomics dragged it below the AAA compliance floor |
 
-When `ipaxInt < wcag.score`, the WCAG grade is shown in parentheses to make visible that the ergonomic model is the limiting factor.
+When `ipaxInt < wcag.score`, the WCAG grade is shown in parentheses to make visible that the ergonomic model is the limiting factor. Ergonomic rewards can never push the score outside the parentheses past the WCAG-earned compliance tier — a pair scoring AA (WCAG 2) can be boosted up to 2.9 by rewards, but never rounds up to a false 3, so the parenthesis notation is one-directional: it only ever shows the score being pulled *down*, never claiming a grade the pair didn't legally earn.
 
 ---
 

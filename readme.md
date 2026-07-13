@@ -21,7 +21,7 @@ The **IPAX score** runs from 0 to 5:
 | 4 | Approaching AAA. Comfortable for extended reading. |
 | 5 | AAA with high perceptual comfort. Best possible. |
 
-A score like `3(2)` means the ergonomics engine raised the score above what the compliance grade alone would give. `X(1)` means it passes one compliance level but the ergonomics brought it to zero.
+A score like `X(1)` means the pair passes WCAG level 1 (large text), but ergonomic penalties dragged the score below the compliance floor. The parenthesis only ever appears when the score is *lower* than the WCAG grade — ergonomics can never push the number outside the parentheses into the next legal grade.
 
 ## Installation
 

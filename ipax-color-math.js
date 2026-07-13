@@ -17,6 +17,14 @@ export function hexToOklch(hex) {
     return { l: L, c: Math.sqrt(a*a + b_*b_), h: H, hex: hex.toUpperCase() };
 }
 
+export function relativeLuminanceWCAG(hex) {
+    const res = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (!res) return 0;
+    const r = parseInt(res[1], 16) / 255, g = parseInt(res[2], 16) / 255, b = parseInt(res[3], 16) / 255;
+    const lin = c => c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+
 export function getY(L, C, H) {
     const hRad = H * Math.PI / 180;
     const a = C * Math.cos(hRad), b_ = C * Math.sin(hRad);

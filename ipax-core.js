@@ -1,5 +1,5 @@
 // Derived from IPAX 2 r.20260517 by Santiago Bustelo (https://bustelo.com.ar) — license pending
-import { hexToOklch, getY, calculateWcagContrast } from './ipax-color-math.js';
+import { hexToOklch, relativeLuminanceWCAG, calculateWcagContrast } from './ipax-color-math.js';
 import * as APCABridge from './ipax-apca-bridge.js';
 import * as Ergo from './ipax-ergonomics.js';
 import * as Dict from './ipax-dictionary.js';
@@ -83,8 +83,9 @@ export function getIPAXscore(textHex, bgHex, forceContext = null, fontWt = 400, 
     const bgOklch = hexToOklch(bgHex);
     if (!txtOklch || !bgOklch) throw new Error('Invalid HEX colors provided to IPAXScore.');
 
-    const txtY = getY(txtOklch.l, txtOklch.c, txtOklch.h);
-    const bgY = getY(bgOklch.l, bgOklch.c, bgOklch.h);
+    // WCAG relative luminance is computed directly from sRGB — not from OKLCH — per the WCAG spec.
+    const txtY = relativeLuminanceWCAG(textHex);
+    const bgY = relativeLuminanceWCAG(bgHex);
     const apcaTxtY = APCABridge.getApcaYFromHex(textHex);
     const apcaBgY = APCABridge.getApcaYFromHex(bgHex);
 
@@ -166,7 +167,12 @@ export function getIPAXscore(textHex, bgHex, forceContext = null, fontWt = 400, 
 
     const rewards = Ergo.calculateRewards(txtOklch, bgOklch, isDarkContext, finalScore, totalPenalty);
     if (rewards.totalReward > 0) {
-        finalScore = Math.min(5, finalScore + rewards.totalReward);
+        const boostedScore = finalScore + rewards.totalReward;
+        // Ergonomic rewards are capped within the earned compliance tier: they can never
+        // push the score into the next legal grade (e.g. AA's 2.x can't round up to a false 3).
+        finalScore = complianceLevel < 3
+            ? Math.min(complianceLevel + 0.9, boostedScore)
+            : Math.min(5, boostedScore);
         warnings.push(...rewards.bonuses);
     }
 
