@@ -1,6 +1,5 @@
-import { getIPAXscore } from './ipax-core.js';
+import { getIPAXscore, hexToOklch } from '@ipax/core';
 import { resolveOklch, parseToHex } from './parse-color.js';
-import { hexToOklch } from './ipax-color-math.js';
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 

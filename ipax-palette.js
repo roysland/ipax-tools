@@ -1,4 +1,4 @@
-import { hexToOklch } from './ipax-color-math.js';
+import { hexToOklch } from '@ipax/core';
 import { parseToHex } from './parse-color.js';
 
 // Machado et al. 2009 — severity=1.0 (full dichromacy)

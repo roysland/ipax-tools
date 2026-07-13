@@ -1,39 +1,11 @@
 ipax-cli
 ========
 
-This project contains code derived from third-party sources listed below.
-A license has been requested from each author and is pending.
-
-
-1. IPAX 2 — Santiago Bustelo
-   Website : https://www.bustelo.com.ar/
-   Source  : https://icograma.com/index.php
-   Status  : Permission granted 2026-06-10 — CC-BY attribution terms
-
-   The following files are derived works of IPAX 2 r.20260517:
-     ipax-core.js          — scoring orchestrator (ported to Node.js ESM)
-     ipax-color-math.js    — OKLCh color space conversions
-     ipax-apca-bridge.js   — APCA Lc calculation and font sizing
-     ipax-ergonomics.js    — perceptual penalty and reward engine
-     ipax-dictionary.js    — penalty/reward data and scientific references
-
-   Adaptation: IIFE browser modules converted to ES module exports.
-   The scoring algorithms, physiological models, and penalty/reward data
-   are reproduced with the intent to credit and obtain permission.
-
-
-2. APCA W3 — Andrew Somers / Myndex Research
-   Repository : https://github.com/Myndex/apca-w3
-   Copyright  : © 2019-2022 Andrew Somers. All Rights Reserved.
-   License    : W3 LICENSE (web content accessibility use)
-
-   The following file is reproduced unmodified from the apca-w3 package:
-     apca-w3.js
-
-   Used for predicting perceptual contrast for web content per WCAG
-   guidelines. The W3 license permits royalty-free use for this purpose.
-   Prohibited uses include medical, clinical, aerospace, transportation,
-   military, and applications not specific to web content.
+This project depends on @ipax/core (../packages/core) for the IPAX scoring
+engine. See ../packages/core/NOTICE for full attribution of the code
+derived from third-party sources (IPAX 2 by Santiago Bustelo, and the
+APCA W3 algorithm by Andrew Somers / Myndex Research) — none of that code
+is duplicated here.
 
 
 Original work in this repository

@@ -1,4 +1,4 @@
-import { getIPAXscore } from './ipax-core.js';
+import { getIPAXscore } from '@ipax/core';
 import { parseToHex, flattenOver } from './parse-color.js';
 
 function compositeLayer(colorStr, bgHex) {

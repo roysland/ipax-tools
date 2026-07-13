@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync } from 'fs';
-import { getIPAXscore } from './ipax-core.js';
+import { getIPAXscore } from '@ipax/core';
 import { parseToHex, flattenOver } from './parse-color.js';
 import { runFind } from './ipax-find.js';
 import { runPalette } from './ipax-palette.js';

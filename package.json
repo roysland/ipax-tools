@@ -8,6 +8,7 @@
     "ipax-mcp": "./mcp-server.js"
   },
   "dependencies": {
+    "@ipax/core": "*",
     "@modelcontextprotocol/sdk": "^1.29.0"
   }
 }
