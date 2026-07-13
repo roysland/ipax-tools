@@ -30,11 +30,11 @@ below, alongside original tooling built on top of them.
 
 Original work in this repository
 ---------------------------------
-cli/ (ipax-cli) and the sandbox web app (src/, public/) are original
-tooling built on top of @ipax/core — see cli/NOTICE for that package's
-specific attribution notes.
+packages/cli/ (ipax-cli) and the sandbox web app (src/, public/) are
+original tooling built on top of @ipax/core — see packages/cli/NOTICE
+for that package's specific attribution notes.
 
 Per-package attribution
 ------------------------
   packages/core/NOTICE — the scoring engine itself
-  cli/NOTICE            — the CLI and MCP server
+  packages/cli/NOTICE  — the CLI and MCP server

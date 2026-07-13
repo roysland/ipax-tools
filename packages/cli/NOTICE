@@ -1,8 +1,8 @@
 ipax-cli
 ========
 
-This project depends on @ipax/core (../packages/core) for the IPAX scoring
-engine. See ../packages/core/NOTICE for full attribution of the code
+This project depends on @ipax/core (../core) for the IPAX scoring
+engine. See ../core/NOTICE for full attribution of the code
 derived from third-party sources (IPAX 2 by Santiago Bustelo, and the
 APCA W3 algorithm by Andrew Somers / Myndex Research) — none of that code
 is duplicated here.

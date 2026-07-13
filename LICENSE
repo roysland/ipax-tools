@@ -6,7 +6,7 @@ This repository contains code derived from IPAX 2 by Santiago Bustelo
 CC-BY attribution terms (permission granted 2026-06-10).
 
 Attribution: Santiago Bustelo is credited by name with links throughout
-this repository (see packages/core/NOTICE and cli/NOTICE). This is
+this repository (see packages/core/NOTICE and packages/cli/NOTICE). This is
 consistent with the CC-BY license direction the author intends to adopt
 for IPAX. IPAX is still active research — no guarantee of architectural
 stability is implied by this permission.

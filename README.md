@@ -15,7 +15,7 @@ This is an npm workspaces monorepo:
 | Package | What it is |
 |---|---|
 | [`packages/core`](./packages/core) | `@ipax/core` — the canonical scoring engine. Everything below depends on this; none of them carry their own copy of the scoring logic. |
-| [`cli`](./cli) | `ipax-cli` — command-line tool and MCP server for scoring color pairs, searching palettes, and compositing layered UI stacks. |
+| [`packages/cli`](./packages/cli) | `ipax-cli` — command-line tool and MCP server for scoring color pairs, searching palettes, and compositing layered UI stacks. |
 | `src`, `public` | The browser sandbox app (Vite) for interactively exploring scores. |
 | [`vendor`](./vendor) | Untouched snapshots of upstream IPAX engine drops from Santiago, kept for diffing when porting updates — see `packages/core/README.md` for that workflow. |
 
