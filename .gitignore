@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Raw vendor engine drops (Santiago's unmodified source, license pending) —
+# kept locally for the vendor-vs-vendor diff workflow, not for distribution.
+# See packages/core/README.md.
+vendor/*
+!vendor/README.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
