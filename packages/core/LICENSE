@@ -1,0 +1,16 @@
+LICENSE — @ipax/core
+=====================
+
+This package contains code derived from IPAX 2 by Santiago Bustelo
+(https://bustelo.com.ar), used with the author's permission under
+CC-BY attribution terms (permission granted 2026-06-10).
+
+Attribution: Santiago Bustelo is credited by name with links in this
+repository. This is consistent with the CC-BY license direction the
+author intends to adopt for IPAX.
+
+The APCA contrast algorithm (apca-w3.js) is copyright © 2019-2022
+Andrew Somers / Myndex Research and is used under the W3 license for
+web content accessibility purposes.
+
+See NOTICE for full attribution details.

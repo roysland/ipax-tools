@@ -1,0 +1,20 @@
+{
+  "name": "@ipax/core",
+  "version": "2.1.0",
+  "private": true,
+  "description": "Canonical IPAX scoring engine — single source of truth consumed by ipax-cli, the Tailwind plugin, and future Figma/Chrome integrations.",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "scripts": {
+    "test": "node --test test/**/*.test.js"
+  },
+  "files": [
+    "index.js",
+    "src",
+    "LICENSE",
+    "NOTICE"
+  ]
+}
