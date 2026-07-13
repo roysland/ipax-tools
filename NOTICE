@@ -30,9 +30,9 @@ below, alongside original tooling built on top of them.
 
 Original work in this repository
 ---------------------------------
-packages/cli/ (ipax-cli) and the sandbox web app (src/, public/) are
-original tooling built on top of @ipax/core — see packages/cli/NOTICE
-for that package's specific attribution notes.
+packages/cli/ (ipax-cli) is original tooling built on top of
+@ipax/core — see packages/cli/NOTICE for that package's specific
+attribution notes.
 
 Per-package attribution
 ------------------------
