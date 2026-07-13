@@ -28,3 +28,7 @@ vendor/*
 *.njsproj
 *.sln
 *.sw?
+
+# Agents
+AGENTS.md
+CLAUDE.md
