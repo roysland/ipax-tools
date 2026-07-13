@@ -1,4 +1,24 @@
 // Derived from IPAX 2 r.20260517 by Santiago Bustelo (https://bustelo.com.ar) — license pending
+
+/** @typedef {import('./types.js').Oklch} Oklch */
+/** @typedef {import('./types.js').PenaltyResult} PenaltyResult */
+/** @typedef {import('./types.js').RewardResult} RewardResult */
+/** @typedef {import('./types.js').Warning} Warning */
+
+/**
+ * Perceptual penalties modeling phenomena a raw contrast ratio can't see —
+ * see ipax-dictionary.js `penalties` for the descriptions/references behind
+ * each slug ('chromostereopsis', 's_cone', 'sim_contrast', 'halation',
+ * 'mydriasis', 'glare'). Chromostereopsis/S-cone/sim-contrast are chroma-
+ * driven and mutually rescaled to a shared 2.0 cap; halation/mydriasis
+ * (dark contexts) and glare (light contexts) are luminance-driven and
+ * mutually exclusive by polarity.
+ *
+ * @param {Oklch} txt
+ * @param {Oklch} bg
+ * @param {boolean} isDarkContext
+ * @returns {PenaltyResult}
+ */
 export function calculatePenalties(txt, bg, isDarkContext) {
     let totalPenalty = 0;
     const warnings = [];
@@ -69,10 +89,28 @@ export function calculatePenalties(txt, bg, isDarkContext) {
     return { totalPenalty, warnings };
 }
 
+/**
+ * Perceptual rewards for design choices that ease reading beyond raw
+ * contrast — see ipax-dictionary.js `rewards` for the descriptions/references
+ * behind each slug ('paper_tone', 'chromatic_relief', 'achromatic_tint_contrast').
+ * Gated by both `biologicalScore` (rewards only apply once contrast is
+ * already reasonably good — smoothstep-ramped between 2.0 and 3.5) and
+ * `totalPenalty` (any of the calculatePenalties penalties above 0.8 zero
+ * the reward out entirely). Capped at a combined 0.5.
+ *
+ * @param {Oklch} txt
+ * @param {Oklch} bg
+ * @param {boolean} isDarkContext
+ * @param {number} biologicalScore - Score after penalties, before rewards.
+ * @param {number} totalPenalty - Sum from calculatePenalties (+ jitter/H-K, applied by the caller).
+ * @returns {RewardResult}
+ */
 export function calculateRewards(txt, bg, isDarkContext, biologicalScore, totalPenalty) {
+    /** @type {Warning[]} */
     const bonuses = [];
     let totalReward = 0;
 
+    /** @param {number} min @param {number} max @param {number} value */
     const smoothstep = (min, max, value) => {
         const x = Math.max(0, Math.min(1, (value - min) / (max - min)));
         return x * x * (3 - 2 * x);

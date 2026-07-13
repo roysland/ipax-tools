@@ -1,4 +1,8 @@
 // Derived from IPAX 2 r.20260517 by Santiago Bustelo (https://bustelo.com.ar) — license pending
+
+/** @typedef {import('./types.js').DictionaryEntry} DictionaryEntry */
+
+/** @type {DictionaryEntry[]} */
 export const penalties = [{
     slug: 'jitter',
     label: 'Isoluminant Jitter',
@@ -41,6 +45,7 @@ export const penalties = [{
     references: ['High, C., et al. (2023). Modeling the Helmholtz-Kohlrausch effect for color appearance.']
 }];
 
+/** @type {DictionaryEntry[]} */
 export const rewards = [{
     slug: 'paper_tone',
     label: 'Paper Tone',
