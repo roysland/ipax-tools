@@ -16,9 +16,10 @@ This is an npm workspaces monorepo:
 |---|---|
 | [`packages/core`](./packages/core) | `@ipax/core` — the canonical scoring engine. Everything below depends on this; none of them carry their own copy of the scoring logic. |
 | [`packages/cli`](./packages/cli) | `ipax-cli` — command-line tool and MCP server for scoring color pairs, searching palettes, and compositing layered UI stacks. |
+| [`packages/tailwind-helper`](./packages/tailwind-helper) | `@ipax/tailwind-helper` — extracts a Tailwind project's custom color palette and scans source for color-utility usage; groundwork for the planned Tailwind build-time plugin/lint. |
 | [`vendor`](./vendor) | Untouched snapshots of upstream IPAX engine drops from Santiago, kept for diffing when porting updates — see `packages/core/README.md` for that workflow. |
 
-Planned: a Tailwind build-time plugin/lint, and possibly a Figma plugin and Chrome devtools extension, all built on `@ipax/core`.
+Planned: a Tailwind build-time plugin/lint built on `@ipax/tailwind-helper` and `@ipax/core`, and possibly a Figma plugin and Chrome devtools extension.
 
 ## License
 

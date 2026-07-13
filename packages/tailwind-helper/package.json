@@ -1,0 +1,32 @@
+{
+  "name": "@ipax/tailwind-helper",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tailwind palette extraction and color-utility usage scanning — groundwork for the planned Tailwind build-time plugin/lint.",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "bin": {
+    "ipax-tailwind": "./bin.js"
+  },
+  "scripts": {
+    "test": "node --test test/**/*.test.js",
+    "typecheck": "tsc --noEmit -p jsconfig.json"
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.3",
+    "postcss": "^8.5.19"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0"
+  },
+  "files": [
+    "index.js",
+    "bin.js",
+    "src",
+    "LICENSE",
+    "NOTICE"
+  ]
+}

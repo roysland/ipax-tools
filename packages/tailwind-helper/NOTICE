@@ -1,0 +1,12 @@
+@ipax/tailwind-helper
+======================
+
+This package does not depend on @ipax/core and does not contain any
+code derived from third-party sources. See ../core/NOTICE for the
+attribution that applies to @ipax/core (IPAX 2 by Santiago Bustelo,
+and the APCA W3 algorithm by Andrew Somers / Myndex Research) — none
+of that code is used here.
+
+Original work in this package
+------------------------------
+All files (index.js, bin.js, src/*) are original contributions.
