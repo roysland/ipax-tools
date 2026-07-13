@@ -1,0 +1,14 @@
+{
+  "name": "ipax-cli",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "ipax": "./index.js",
+    "ipax-mcp": "./mcp-server.js"
+  },
+  "dependencies": {
+    "@ipax/core": "*",
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  }
+}

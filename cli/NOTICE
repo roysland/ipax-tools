@@ -1,0 +1,18 @@
+ipax-cli
+========
+
+This project depends on @ipax/core (../packages/core) for the IPAX scoring
+engine. See ../packages/core/NOTICE for full attribution of the code
+derived from third-party sources (IPAX 2 by Santiago Bustelo, and the
+APCA W3 algorithm by Andrew Somers / Myndex Research) — none of that code
+is duplicated here.
+
+
+Original work in this repository
+---------------------------------
+The following files are original contributions not derived from the above:
+  index.js          — CLI entry point and argument parsing
+  parse-color.js    — universal color parser (hex, rgb, oklch, color-mix, named)
+  ipax-find.js      — OKLCh grid search command
+  ipax-palette.js   — palette ΔE matrix and CVD simulation
+  ipax-stack.js     — layer compositor and stack scoring
