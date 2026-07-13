@@ -2,7 +2,7 @@
 
 > **Based on the work of Santiago Bustelo** — [bustelo.com.ar](https://www.bustelo.com.ar/) · [icograma.com](https://icograma.com/index.php)
 >
-> The IPAX scoring engine, ergonomics model, and perceptual dictionary are derived from his IPAX 2 system. License pending his permission. See [NOTICE](./NOTICE) for full attribution.
+> The IPAX scoring engine, ergonomics model, and perceptual dictionary are derived from his IPAX 2 system, used with his permission under CC-BY attribution terms (granted 2026-06-10). See [NOTICE](./NOTICE) for full attribution.
 >
 > The APCA contrast algorithm (`apca-w3.js`) is copyright © 2019-2022 Andrew Somers / Myndex Research, used under the W3 license for web content accessibility.
 

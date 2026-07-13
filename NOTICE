@@ -1,0 +1,40 @@
+ipax-tools
+==========
+
+This repository contains code derived from third-party sources listed
+below, alongside original tooling built on top of them.
+
+1. IPAX 2 — Santiago Bustelo
+   Website : https://www.bustelo.com.ar/
+   Source  : https://icograma.com/index.php
+   Status  : Permission granted 2026-06-10 — CC-BY attribution terms
+
+   The IPAX scoring engine, ergonomics model, and perceptual dictionary
+   in packages/core/src/ are derived from Santiago Bustelo's IPAX 2.
+   See packages/core/NOTICE for the per-file breakdown.
+
+   vendor/ contains unmodified snapshots of vendor engine drops, kept
+   for diffing purposes when porting updates into packages/core — see
+   packages/core/README.md for that workflow.
+
+2. APCA W3 — Andrew Somers / Myndex Research
+   Repository : https://github.com/Myndex/apca-w3
+   Copyright  : © 2019-2022 Andrew Somers. All Rights Reserved.
+   License    : W3 LICENSE (web content accessibility use)
+
+   Reproduced unmodified as packages/core/src/apca-w3.js. Used for
+   predicting perceptual contrast for web content per WCAG guidelines.
+   The W3 license permits royalty-free use for this purpose. Prohibited
+   uses include medical, clinical, aerospace, transportation, military,
+   and applications not specific to web content.
+
+Original work in this repository
+---------------------------------
+cli/ (ipax-cli) and the sandbox web app (src/, public/) are original
+tooling built on top of @ipax/core — see cli/NOTICE for that package's
+specific attribution notes.
+
+Per-package attribution
+------------------------
+  packages/core/NOTICE — the scoring engine itself
+  cli/NOTICE            — the CLI and MCP server

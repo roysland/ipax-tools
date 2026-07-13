@@ -1,0 +1,22 @@
+LICENSE — ipax-tools
+=====================
+
+This repository contains code derived from IPAX 2 by Santiago Bustelo
+(https://bustelo.com.ar), used with the author's permission under
+CC-BY attribution terms (permission granted 2026-06-10).
+
+Attribution: Santiago Bustelo is credited by name with links throughout
+this repository (see packages/core/NOTICE and cli/NOTICE). This is
+consistent with the CC-BY license direction the author intends to adopt
+for IPAX. IPAX is still active research — no guarantee of architectural
+stability is implied by this permission.
+
+This repository also depends on the APCA contrast algorithm (apca-w3.js),
+copyright © 2019-2022 Andrew Somers / Myndex Research, used under the
+W3 license for web content accessibility purposes.
+
+The original tooling in this repository (the CLI, MCP server, and
+sandbox web app — see NOTICE for the file breakdown) is not yet released
+under a declared open-source license.
+
+See NOTICE for full attribution details.
