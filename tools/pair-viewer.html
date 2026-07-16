@@ -185,6 +185,19 @@
   .chip.rew { background: var(--chip-rew-bg); color: var(--chip-rew-ink); }
   .chip.none { color: var(--ink-soft); padding-left: 0; }
 
+  .badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-variant-numeric: tabular-nums;
+  }
+  .badge.frag-high { background: var(--chip-pen-bg); color: var(--chip-pen-ink); }
+  .badge.frag-medium { border: 1px solid var(--ink-soft); color: var(--ink-soft); }
+  .badge.frag-low { background: var(--chip-rew-bg); color: var(--chip-rew-ink); }
+
   footer {
     font-size: 0.78rem;
     color: var(--ink-soft);
@@ -225,12 +238,16 @@
         <span class="label">APCA</span>
         <span class="value" id="apca"></span>
       </div>
+      <div class="score-block">
+        <span class="label">Surround fragility</span>
+        <span class="value"><span class="badge" id="frag"></span></span>
+      </div>
     </div>
     <div class="hexes" id="hexes"></div>
     <div class="chips" id="chips"></div>
   </section>
 
-  <footer>Groups: A pure-white peak contrast &middot; B paper tones &middot; C dark mode &middot; D reduced contrast. Arrow buttons or the select move between pairs.</footer>
+  <footer>Groups: A pure-white peak contrast &middot; B paper tones &middot; C dark mode &middot; D reduced contrast. Arrow buttons or the select move between pairs. Surround fragility estimates how much a score depends on fullscreen viewing (see tools/surround-fragile.mjs).</footer>
 </div>
 
 <script>
@@ -251,6 +268,15 @@
     { g: 'D — reduced contrast', txt: '#6B6B6B', bg: '#F2EFE9', ipax: '2',    score: 2.1, wcag: '4.64:1', wgrade: 'AA',   lc: 67.2, agrade: 'Bronze',   pen: [], rew: [] },
     { g: 'D — reduced contrast', txt: '#767676', bg: '#FFFFFF', ipax: '1(2)', score: 1,   wcag: '4.54:1', wgrade: 'AA',   lc: 71.6, agrade: 'Bronze',   pen: [['glare', 1.0]], rew: [] },
     { g: 'D — reduced contrast', txt: '#8A8A8A', bg: '#E8E2D4', ipax: 'X',    score: 0,   wcag: '2.67:1', wgrade: 'Fail', lc: 45.2, agrade: 'Standard', pen: [], rew: [] },
+  ];
+
+  // Surround fragility per pair, from tools/surround-fragile.mjs
+  // (term dependence + forceContext-flip delta; see that script for the model).
+  const FRAG = [
+    [2.0, 'high'], [2.0, 'high'], [2.0, 'high'], [2.2, 'high'],
+    [0.12, 'low'], [0.14, 'low'], [0.46, 'medium'], [0.47, 'medium'],
+    [2.4, 'high'], [0.2, 'low'], [0.2, 'low'], [0.0, 'low'],
+    [2.2, 'high'], [0.0, 'low'], [2.0, 'high'], [0.0, 'low'],
   ];
 
   const sel = document.getElementById('pair-select');
@@ -282,6 +308,11 @@
     document.getElementById('wcag').innerHTML = p.wcag + ' <span class="sub">' + p.wgrade + '</span>';
     document.getElementById('apca').innerHTML = 'Lc ' + p.lc + ' <span class="sub">' + p.agrade + '</span>';
     document.getElementById('hexes').textContent = 'text ' + p.txt + '  ·  background ' + p.bg;
+
+    const fr = FRAG[i];
+    const badge = document.getElementById('frag');
+    badge.textContent = fr[1] + ' · ' + fr[0].toFixed(2);
+    badge.className = 'badge frag-' + fr[1];
 
     const chips = document.getElementById('chips');
     chips.innerHTML = '';
