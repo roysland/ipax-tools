@@ -245,6 +245,24 @@
   .judgment-row button.same { background: #6E6961; }
   .judgment-row button:hover { filter: brightness(1.2); }
 
+  .replay-row {
+    position: fixed;
+    bottom: 6.6rem; left: 50%; transform: translateX(-50%);
+    display: none;
+    gap: 0.6rem;
+    z-index: 20;
+  }
+  .replay-row.visible { display: flex; }
+  .replay-row button {
+    font: inherit; font-size: 0.8rem; font-weight: 600;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.35);
+    background: transparent; color: #fff;
+    cursor: pointer;
+  }
+  .replay-row button:hover { background: rgba(255,255,255,0.15); }
+
   .judgment-prompt {
     position: fixed;
     bottom: 4.6rem; left: 50%; transform: translateX(-50%);
@@ -375,6 +393,10 @@
   <div id="blank-overlay" class="hidden"></div>
 
   <div class="judgment-prompt" id="judgment-prompt">Which was more comfortable to read?</div>
+  <div class="replay-row" id="replay-row">
+    <button type="button" data-replay="first">Show first again <kbd>Q</kbd></button>
+    <button type="button" data-replay="second">Show second again <kbd>W</kbd></button>
+  </div>
   <div class="judgment-row" id="judgment-row">
     <button type="button" data-choice="first">First <kbd>1</kbd></button>
     <button type="button" class="same" data-choice="same">Same <kbd>2</kbd></button>
@@ -396,7 +418,7 @@
     <div style="overflow-x:auto">
       <table id="results-table">
         <thead>
-          <tr><th>Group</th><th>Text</th><th>Background</th><th>IPAX</th><th>Fragility</th><th>Judgment</th></tr>
+          <tr><th>Group</th><th>Text</th><th>Background</th><th>IPAX</th><th>Fragility</th><th>Judgment</th><th>Replays</th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -527,6 +549,8 @@
   const blankOverlay = document.getElementById('blank-overlay');
   const judgmentRow = document.getElementById('judgment-row');
   const judgmentPrompt = document.getElementById('judgment-prompt');
+  const replayRow = document.getElementById('replay-row');
+  let replayCount = 0;
 
   function setCondition(condition, p) {
     testScreen.classList.remove('clean', 'disturbed');
@@ -535,36 +559,44 @@
     testFrame.style.color = p.txt;
   }
 
+  function secondConditionOf(t) {
+    return t.firstCondition === 'clean' ? 'disturbed' : 'clean';
+  }
+
+  // A stimulus is always bracketed by the neutral-gray pause on both sides —
+  // replays reuse this so re-viewing a condition never skips the adaptation
+  // reset the whole design depends on.
+  function playBlank(durationMs, onDone) {
+    testFrame.classList.add('hidden');
+    testScreen.classList.remove('clean', 'disturbed');
+    blankOverlay.classList.remove('hidden');
+    stageTimeoutId = setTimeout(onDone, durationMs);
+  }
+
+  function playStimulus(condition, label, onDone) {
+    const t = trials[ti];
+    blankOverlay.classList.add('hidden');
+    testFrame.classList.remove('hidden');
+    testProgress.textContent = 'Pair ' + (ti + 1) + ' / ' + trials.length + ' — ' + label;
+    setCondition(condition, PAIRS[t.pairIndex]);
+    stageTimeoutId = setTimeout(onDone, STIMULUS_DURATION_MS);
+  }
+
   // Trial stages: showFirst -> blank -> showSecond -> judgment
   function showTrial() {
     const t = trials[ti];
     judgmentRow.classList.remove('visible');
     judgmentPrompt.classList.remove('visible');
-    blankOverlay.classList.add('hidden');
-    testFrame.classList.remove('hidden');
+    replayRow.classList.remove('visible');
+    replayCount = 0;
 
     testProgress.textContent = 'Pair ' + (ti + 1) + ' / ' + trials.length + ' — first';
-    setCondition(t.firstCondition, PAIRS[t.pairIndex]);
-    stageTimeoutId = setTimeout(showBlankBeforeSecond, STIMULUS_DURATION_MS);
-  }
-
-  function showBlankBeforeSecond() {
-    const t = trials[ti];
-    testFrame.classList.add('hidden');
-    testScreen.classList.remove('clean', 'disturbed');
-    blankOverlay.classList.remove('hidden');
-    testProgress.textContent = 'Pair ' + (ti + 1) + ' / ' + trials.length;
-    stageTimeoutId = setTimeout(showSecond, INTER_STIMULUS_PAUSE_MS);
-  }
-
-  function showSecond() {
-    const t = trials[ti];
-    const secondCondition = t.firstCondition === 'clean' ? 'disturbed' : 'clean';
-    blankOverlay.classList.add('hidden');
-    testFrame.classList.remove('hidden');
-    testProgress.textContent = 'Pair ' + (ti + 1) + ' / ' + trials.length + ' — second';
-    setCondition(secondCondition, PAIRS[t.pairIndex]);
-    stageTimeoutId = setTimeout(showJudgment, STIMULUS_DURATION_MS);
+    playStimulus(t.firstCondition, 'first', () => {
+      testProgress.textContent = 'Pair ' + (ti + 1) + ' / ' + trials.length;
+      playBlank(INTER_STIMULUS_PAUSE_MS, () => {
+        playStimulus(secondConditionOf(t), 'second', showJudgment);
+      });
+    });
   }
 
   function showJudgment() {
@@ -574,7 +606,30 @@
     testProgress.textContent = 'Pair ' + (ti + 1) + ' / ' + trials.length + ' — judge';
     judgmentPrompt.classList.add('visible');
     judgmentRow.classList.add('visible');
+    replayRow.classList.add('visible');
     stageTimeoutId = null;
+  }
+
+  // Lets the participant re-view either condition if they were distracted the
+  // first time — paced the same as the original presentation (pause before
+  // and after) so a replay can't skip adaptation and turn into an instant,
+  // adaptation-contaminating flicker toggle between the two conditions.
+  function replayCondition(which) {
+    if (stageTimeoutId !== null) return;
+    if (!judgmentRow.classList.contains('visible')) return;
+
+    const t = trials[ti];
+    const condition = which === 'first' ? t.firstCondition : secondConditionOf(t);
+    replayCount += 1;
+    judgmentRow.classList.remove('visible');
+    judgmentPrompt.classList.remove('visible');
+    replayRow.classList.remove('visible');
+
+    playBlank(INTER_STIMULUS_PAUSE_MS, () => {
+      playStimulus(condition, 'replay ' + which, () => {
+        playBlank(INTER_STIMULUS_PAUSE_MS, showJudgment);
+      });
+    });
   }
 
   function recordJudgment(choice) {
@@ -585,7 +640,7 @@
     const t = trials[ti];
     const p = PAIRS[t.pairIndex];
     const fr = FRAG[t.pairIndex];
-    const secondCondition = t.firstCondition === 'clean' ? 'disturbed' : 'clean';
+    const secondCondition = secondConditionOf(t);
 
     let judgment = 'same';
     if (choice === 'first') judgment = t.firstCondition === 'clean' ? 'clean_better' : 'disturbed_better';
@@ -602,6 +657,7 @@
       firstCondition: t.firstCondition,
       choice,
       judgment,
+      replayCount,
       context,
     });
 
@@ -615,6 +671,10 @@
 
   document.querySelectorAll('.judgment-row button').forEach(btn => {
     btn.addEventListener('click', () => recordJudgment(btn.dataset.choice));
+  });
+
+  document.querySelectorAll('.replay-row button').forEach(btn => {
+    btn.addEventListener('click', () => replayCondition(btn.dataset.replay));
   });
 
   document.getElementById('abort-btn').addEventListener('click', () => finishTest());
@@ -670,7 +730,8 @@
         '<td>' + r.background + '</td>' +
         '<td>' + r.ipax + '</td>' +
         '<td>' + r.fragility.toFixed(2) + ' ' + r.fragilityGrade + '</td>' +
-        '<td class="judgment-' + r.judgment + '">' + r.judgment.replace('_', ' ') + '</td>';
+        '<td class="judgment-' + r.judgment + '">' + r.judgment.replace('_', ' ') + '</td>' +
+        '<td>' + r.replayCount + '</td>';
       tbody.appendChild(tr);
     });
   }
@@ -691,12 +752,16 @@
     setupScreen.classList.remove('hidden');
   });
 
-  // keyboard shortcuts, only acted on during the judgment stage: 1/2/3 = first/same/second
+  // keyboard shortcuts, only acted on during the judgment stage:
+  // 1/2/3 = first/same/second, q/w = replay first/second
   document.addEventListener('keydown', (e) => {
     if (testScreen.classList.contains('hidden')) return;
-    if (e.key === '1') recordJudgment('first');
-    else if (e.key === '2') recordJudgment('same');
-    else if (e.key === '3') recordJudgment('second');
+    const key = e.key.toLowerCase();
+    if (key === '1') recordJudgment('first');
+    else if (key === '2') recordJudgment('same');
+    else if (key === '3') recordJudgment('second');
+    else if (key === 'q') replayCondition('first');
+    else if (key === 'w') replayCondition('second');
     else if (e.key === 'Escape') finishTest();
   });
 </script>
