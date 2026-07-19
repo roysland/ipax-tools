@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IPAX surround fragility test</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ground: #E7E4DD;
+    --surface: #EFEDE7;
+    --ink: #3A3733;
+    --ink-soft: #6E6961;
+    --line: #D2CEC5;
+    --accent: #6E7F63;
+    --warn: #7A4F42;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #232120;
+      --surface: #2C2A28;
+      --ink: #D6D2CB;
+      --ink-soft: #948E85;
+      --line: #3D3A37;
+      --accent: #8FA182;
+      --warn: #D8A99C;
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #E7E4DD; --surface: #EFEDE7; --ink: #3A3733; --ink-soft: #6E6961;
+    --line: #D2CEC5; --accent: #6E7F63; --warn: #7A4F42;
+  }
+  :root[data-theme="dark"] {
+    --ground: #232120; --surface: #2C2A28; --ink: #D6D2CB; --ink-soft: #948E85;
+    --line: #3D3A37; --accent: #8FA182; --warn: #D8A99C;
+  }
+
+  html, body { height: 100%; }
+  body {
+    font-family: system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--ground);
+    line-height: 1.5;
+  }
+
+  .hidden { display: none !important; }
+
+  /* ---------- setup screen ---------- */
+  .wrap {
+    max-width: 38rem;
+    margin: 0 auto;
+    padding: 3rem 1.25rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  h1 { font-size: 1.15rem; font-weight: 600; }
+  .wrap > p { color: var(--ink-soft); font-size: 0.9rem; max-width: 34rem; }
+
+  fieldset {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  legend {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    padding: 0 0.3rem;
+  }
+  label.opt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    padding: 0.3rem 0.2rem;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  label.opt:hover { background: var(--surface); }
+  input[type="radio"], input[type="checkbox"] { accent-color: var(--accent); width: 1.05rem; height: 1.05rem; }
+
+  .photophobic-known {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.9rem;
+  }
+  .photophobic-known button {
+    font: inherit;
+    font-size: 0.8rem;
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+  }
+
+  .start-row { display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem; }
+  #start-btn {
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    background: var(--accent);
+    color: var(--ground);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.4rem;
+    cursor: pointer;
+  }
+  #start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .hint { font-size: 0.8rem; color: var(--ink-soft); }
+
+  /* ---------- test screen ---------- */
+  #test-screen {
+    position: fixed;
+    inset: 0;
+    background: #444;
+    overflow: hidden;
+  }
+
+  /* phase: disturbed — simulated ultrawide desktop surround */
+  #test-screen.disturbed {
+    background: linear-gradient(115deg, #4a2a6b, #8a3a7a, #d3568f, #8a3a7a, #4a2a6b);
+    background-size: 400% 400%;
+    animation: driftgrad 22s ease-in-out infinite;
+  }
+  .chrome-bar, .dock, .side-window { display: none; }
+  #test-screen.disturbed .chrome-bar,
+  #test-screen.disturbed .dock,
+  #test-screen.disturbed .side-window { display: flex; }
+  #test-screen.disturbed .side-window { display: block; }
+  @keyframes driftgrad {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .chrome-bar {
+    position: absolute; top: 0; left: 0; right: 0; height: 2.4rem;
+    background: #d9d9d9;
+    display: flex; align-items: center; gap: 0.4rem;
+    padding: 0 0.75rem;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.15);
+  }
+  .chrome-bar .dot { width: 0.65rem; height: 0.65rem; border-radius: 50%; }
+  .chrome-bar .dot:nth-child(1) { background: #ff5f56; }
+  .chrome-bar .dot:nth-child(2) { background: #ffbd2e; }
+  .chrome-bar .dot:nth-child(3) { background: #27c93f; }
+  .chrome-bar .url {
+    margin-left: 1rem; flex: 1; max-width: 22rem; height: 1.1rem;
+    background: #f2f2f2; border-radius: 999px;
+  }
+  .dock {
+    position: absolute; bottom: 0.6rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 0.6rem;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(6px);
+    border-radius: 1.2rem;
+    padding: 0.5rem 0.9rem;
+  }
+  .dock .icon {
+    width: 2.1rem; height: 2.1rem; border-radius: 0.55rem;
+    background: linear-gradient(145deg, #ffffff, #b8b8b8);
+  }
+  .side-window {
+    position: absolute; top: 3.5rem; bottom: 3.8rem;
+    width: 16rem;
+    background: rgba(230,230,230,0.85);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  }
+  .side-window.left { left: 1rem; }
+  .side-window.right { right: 1rem; }
+
+  .test-frame {
+    position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: min(90vw, 42rem);
+    max-height: 82vh;
+    overflow: auto;
+    border-radius: 10px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+    padding: 2.5rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+  #test-screen.clean .test-frame { box-shadow: none; }
+  .test-frame h2 {
+    font-family: Charter, Georgia, 'Times New Roman', serif;
+    font-size: 1.5rem; font-weight: 700; line-height: 1.25;
+  }
+  .test-frame p {
+    font-family: Charter, Georgia, 'Times New Roman', serif;
+    font-size: 1.05rem; line-height: 1.6; max-width: 58ch;
+  }
+  .test-frame .fine { font-family: system-ui, sans-serif; font-size: 0.8rem; opacity: 0.85; }
+
+  .test-progress {
+    position: absolute; top: 0.6rem; left: 50%; transform: translateX(-50%);
+    font: 600 0.75rem system-ui, sans-serif;
+    color: #fff;
+    background: rgba(0,0,0,0.45);
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    z-index: 5;
+    letter-spacing: 0.02em;
+  }
+  #test-screen.disturbed .test-progress { top: 3rem; }
+
+  .rating-row {
+    position: fixed;
+    bottom: 5.2rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 0.6rem;
+    z-index: 6;
+  }
+  #test-screen.clean .rating-row { bottom: 2rem; }
+  .rating-row button {
+    font: inherit; font-size: 0.9rem; font-weight: 600;
+    padding: 0.65rem 1.1rem;
+    border-radius: 999px; border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  }
+  .rating-row button.comfortable { background: #4C5C41; color: #DCE1D4; }
+  .rating-row button.tolerable   { background: #8a7a3a; color: #f5efd8; }
+  .rating-row button.draining    { background: #7A4F42; color: #E4D8D2; }
+  .rating-row button:hover { filter: brightness(1.1); }
+
+  kbd {
+    display: inline-block;
+    font: 0.7rem/1 ui-monospace, 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+    background: rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 4px;
+    padding: 0.1em 0.45em;
+    min-width: 1.4em;
+    text-align: center;
+    vertical-align: middle;
+    margin-left: 0.25em;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,0.12);
+  }
+  @media (hover: none) and (pointer: coarse) {
+    kbd { display: none; }
+  }
+
+  .abort-btn {
+    position: fixed; top: 0.6rem; right: 0.6rem; z-index: 7;
+    font: 600 0.75rem system-ui, sans-serif;
+    background: rgba(0,0,0,0.45); color: #fff;
+    border: none; border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    cursor: pointer;
+  }
+
+  #pause-overlay {
+    position: fixed;
+    inset: 0;
+    background: #808080;
+    z-index: 20;
+  }
+
+  /* ---------- results screen ---------- */
+  #results-screen .wrap { max-width: 50rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--line); }
+  th { color: var(--ink-soft); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  td.rating-comfortable { color: var(--accent); }
+  td.rating-draining { color: var(--warn); }
+  .actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .actions button {
+    font: inherit; font-size: 0.9rem;
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 0.55rem 1rem; cursor: pointer;
+  }
+  .actions button.primary { background: var(--accent); color: var(--ground); border-color: transparent; }
+
+  #setup-screen .wrap a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+<!-- LIVE ENVIRONMENT URL -->
+<!-- https://ipax-surround-test.wasmer.app/fragility-test.html -->
+<!-- ============ SETUP ============ -->
+<div id="setup-screen">
+  <div class="wrap">
+    <header>
+      <h1>IPAX surround fragility test</h1>
+      <p>Rate the same text/background pairs twice: once in a clean, isolated view, then again surrounded by simulated desktop chatter (dock, browser chrome, adjacent windows, a drifting wallpaper). Each pair is scored comfortable, tolerable, or draining. Results are collected as a downloadable dataset — nothing leaves this page.</p>
+      <p><a href="/fragility-compare.html">Switch to the comparative fragility test</a></p>
+    </header>
+
+    <fieldset id="time-field">
+      <legend>Time of day</legend>
+      <label class="opt"><input type="radio" name="tod" value="morning"> Morning</label>
+      <label class="opt"><input type="radio" name="tod" value="midday"> Midday</label>
+      <label class="opt"><input type="radio" name="tod" value="afternoon"> Afternoon</label>
+      <label class="opt"><input type="radio" name="tod" value="evening"> Evening</label>
+      <label class="opt"><input type="radio" name="tod" value="night"> Night</label>
+    </fieldset>
+
+    <fieldset id="light-field">
+      <legend>Room lighting</legend>
+      <label class="opt"><input type="radio" name="light" value="sunlight"> Bright daylight / direct sunlight</label>
+      <label class="opt"><input type="radio" name="light" value="artificial"> Artificial / indoor light only</label>
+      <label class="opt"><input type="radio" name="light" value="mixed"> Mixed daylight and artificial</label>
+      <label class="opt"><input type="radio" name="light" value="dim"> Dim / low light</label>
+      <label class="opt"><input type="radio" name="light" value="dark"> No ambient light (dark)</label>
+    </fieldset>
+
+    <fieldset id="photophobic-ask-field">
+      <legend>Photophobic sensitivity</legend>
+      <label class="opt"><input type="radio" name="photophobic" value="yes"> Yes — I have light/glare sensitivity (migraine, ME/CFS, post-concussion, etc.)</label>
+      <label class="opt"><input type="radio" name="photophobic" value="no"> No</label>
+    </fieldset>
+
+    <div id="photophobic-known-field" class="fieldset hidden">
+      <div class="photophobic-known">
+        <span>Photophobic sensitivity: <strong id="photophobic-known-value"></strong></span>
+        <button type="button" id="photophobic-change-btn">Change</button>
+      </div>
+    </div>
+
+    <div class="start-row">
+      <button type="button" id="start-btn" disabled>Start test (fullscreen)</button>
+      <span class="hint">32 ratings total — 16 pairs × clean and disturbed.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TEST ============ -->
+<div id="test-screen" class="hidden">
+  <button type="button" class="abort-btn" id="abort-btn">Exit test <kbd>Esc</kbd></button>
+  <div class="chrome-bar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url"></span>
+  </div>
+  <div class="side-window left"></div>
+  <div class="side-window right"></div>
+  <div class="dock">
+    <span class="icon"></span><span class="icon"></span><span class="icon"></span>
+    <span class="icon"></span><span class="icon"></span><span class="icon"></span>
+  </div>
+
+  <div class="test-progress" id="test-progress"></div>
+
+  <div class="test-frame" id="test-frame">
+    <h2>Reading under test conditions</h2>
+    <p id="test-paragraph">Contrast that looks correct on a calibrated panel can behave very differently in a real room. This paragraph is set at body size so you can judge the pair the way you would actually meet it: sustained reading, not a glance at a swatch. Stay with it for a moment and notice whether the edges of the letters feel stable or whether the page itself starts to press back.</p>
+    <p class="fine">Spot text and captions render at this size — often the first thing to go.</p>
+  </div>
+
+  <div class="rating-row">
+    <button type="button" class="comfortable" data-rating="comfortable">Comfortable <kbd>1</kbd></button>
+    <button type="button" class="tolerable" data-rating="tolerable">Tolerable <kbd>2</kbd></button>
+    <button type="button" class="draining" data-rating="draining">Draining <kbd>3</kbd></button>
+  </div>
+
+  <div id="pause-overlay" class="hidden"></div>
+</div>
+
+<!-- ============ RESULTS ============ -->
+<div id="results-screen" class="hidden">
+  <div class="wrap">
+    <header>
+      <h1>Results</h1>
+      <p id="results-summary"></p>
+    </header>
+    <div class="actions">
+      <button type="button" class="primary" id="download-btn">Download JSON</button>
+      <button type="button" id="restart-btn">Run again</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table id="results-table">
+        <thead>
+          <tr><th>Phase</th><th>Group</th><th>Text</th><th>Background</th><th>IPAX</th><th>Fragility</th><th>Rating</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Single on/off switch: insert a blank neutral-gray pause between pairs so
+  // pupil/adaptation state resets before the next reading, instead of rating
+  // pair N+1 while still adapted to pair N's luminance.
+  const INTER_PAIR_PAUSE = true;
+  const PAUSE_DURATION_MS = 2200;
+
+  // IPAX pair suite and precomputed scores/fragility — mirrors tools/pair-viewer.html
+  // and tools/surround-fragile.mjs. Kept as static data here (rather than importing
+  // packages/core as an ES module) so this page runs directly from the filesystem,
+  // no local server required.
+  const PAIRS = [
+    { g: 'A — peak contrast on pure white', txt: '#000000', bg: '#FFFFFF', ipax: '4' },
+    { g: 'A — peak contrast on pure white', txt: '#1A1A1A', bg: '#FFFFFF', ipax: '4' },
+    { g: 'A — peak contrast on pure white', txt: '#333333', bg: '#FFFFFF', ipax: '4' },
+    { g: 'A — peak contrast on pure white', txt: '#4D4D4D', bg: '#FFFFFF', ipax: '3' },
+    { g: 'B — paper tones', txt: '#000000', bg: '#F5F1E8', ipax: '5' },
+    { g: 'B — paper tones', txt: '#333333', bg: '#F2EFE9', ipax: '4' },
+    { g: 'B — paper tones', txt: '#333333', bg: '#EDE8DC', ipax: '4' },
+    { g: 'B — paper tones', txt: '#3A3A3A', bg: '#E8E2D4', ipax: '4' },
+    { g: 'C — dark mode', txt: '#FFFFFF', bg: '#000000', ipax: '3' },
+    { g: 'C — dark mode', txt: '#E6E6E6', bg: '#121212', ipax: '5' },
+    { g: 'C — dark mode', txt: '#C9C9C9', bg: '#1E1E1E', ipax: '3' },
+    { g: 'C — dark mode', txt: '#B3B3B3', bg: '#2B2B2B', ipax: '2' },
+    { g: 'D — reduced contrast', txt: '#595959', bg: '#FFFFFF', ipax: '3' },
+    { g: 'D — reduced contrast', txt: '#6B6B6B', bg: '#F2EFE9', ipax: '2' },
+    { g: 'D — reduced contrast', txt: '#767676', bg: '#FFFFFF', ipax: '1(2)' },
+    { g: 'D — reduced contrast', txt: '#8A8A8A', bg: '#E8E2D4', ipax: 'X' },
+  ];
+  const FRAG = [
+    [2.0, 'high'], [2.0, 'high'], [2.0, 'high'], [2.2, 'high'],
+    [0.12, 'low'], [0.14, 'low'], [0.46, 'medium'], [0.47, 'medium'],
+    [2.4, 'high'], [0.2, 'low'], [0.2, 'low'], [0.0, 'low'],
+    [2.2, 'high'], [0.0, 'low'], [2.0, 'high'], [0.0, 'low'],
+  ];
+
+  const LS_KEY = 'ipax_photophobic';
+
+  const setupScreen = document.getElementById('setup-screen');
+  const testScreen = document.getElementById('test-screen');
+  const resultsScreen = document.getElementById('results-screen');
+
+  const startBtn = document.getElementById('start-btn');
+  const timeField = document.getElementById('time-field');
+  const lightField = document.getElementById('light-field');
+  const askField = document.getElementById('photophobic-ask-field');
+  const knownField = document.getElementById('photophobic-known-field');
+  const knownValue = document.getElementById('photophobic-known-value');
+  const changeBtn = document.getElementById('photophobic-change-btn');
+
+  let photophobic = localStorage.getItem(LS_KEY); // 'yes' | 'no' | null
+
+  function renderPhotophobicField() {
+    if (photophobic === 'yes' || photophobic === 'no') {
+      askField.classList.add('hidden');
+      knownField.classList.remove('hidden');
+      knownValue.textContent = photophobic === 'yes' ? 'Yes' : 'No';
+    } else {
+      askField.classList.remove('hidden');
+      knownField.classList.add('hidden');
+    }
+    updateStartEnabled();
+  }
+
+  changeBtn.addEventListener('click', () => {
+    photophobic = null;
+    localStorage.removeItem(LS_KEY);
+    renderPhotophobicField();
+  });
+
+  askField.addEventListener('change', (e) => {
+    if (e.target.name === 'photophobic') {
+      photophobic = e.target.value;
+      localStorage.setItem(LS_KEY, photophobic);
+    }
+    updateStartEnabled();
+  });
+  timeField.addEventListener('change', updateStartEnabled);
+  lightField.addEventListener('change', updateStartEnabled);
+
+  function getRadioValue(field, name) {
+    const el = field.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : null;
+  }
+
+  function updateStartEnabled() {
+    const tod = getRadioValue(timeField, 'tod');
+    const light = getRadioValue(lightField, 'light');
+    const ppKnown = photophobic === 'yes' || photophobic === 'no';
+    startBtn.disabled = !(tod && light && ppKnown);
+  }
+
+  renderPhotophobicField();
+
+  // ---------- test run state ----------
+  let context = null;
+  let queue = []; // [{ phase, pairIndex }]
+  let qi = 0;
+  const results = [];
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function buildQueue() {
+    // Clean and disturbed trials are interleaved randomly, not run as two
+    // blocks — otherwise disturbed (always last) absorbs all the fatigue
+    // accumulated over the session and looks worse for that reason alone,
+    // not because of the surround itself.
+    const idx = PAIRS.map((_, i) => i);
+    const clean = idx.map(i => ({ phase: 'clean', pairIndex: i }));
+    const disturbed = idx.map(i => ({ phase: 'disturbed', pairIndex: i }));
+    const all = shuffle(clean.concat(disturbed));
+    let cleanSeen = 0, disturbedSeen = 0;
+    all.forEach(step => {
+      step.phaseIndex = step.phase === 'clean' ? ++cleanSeen : ++disturbedSeen;
+    });
+    return all;
+  }
+
+  const testFrame = document.getElementById('test-frame');
+  const testProgress = document.getElementById('test-progress');
+  const pauseOverlay = document.getElementById('pause-overlay');
+  let pauseTimeoutId = null;
+
+  function showStep() {
+    const step = queue[qi];
+    const p = PAIRS[step.pairIndex];
+    testScreen.classList.remove('clean', 'disturbed');
+    testScreen.classList.add(step.phase);
+    testFrame.style.background = p.bg;
+    testFrame.style.color = p.txt;
+    testProgress.textContent =
+      (step.phase === 'clean' ? 'Clean · ' : 'Disturbed · ') +
+      step.phaseIndex + ' / ' + PAIRS.length +
+      '  (overall ' + (qi + 1) + '/' + queue.length + ')';
+  }
+
+  function recordRating(rating) {
+    const step = queue[qi];
+    const p = PAIRS[step.pairIndex];
+    const fr = FRAG[step.pairIndex];
+    results.push({
+      timestamp: new Date().toISOString(),
+      phase: step.phase,
+      group: p.g,
+      text: p.txt,
+      background: p.bg,
+      ipax: p.ipax,
+      fragility: fr[0],
+      fragilityGrade: fr[1],
+      rating,
+      context,
+    });
+    qi += 1;
+    if (qi >= queue.length) {
+      finishTest();
+    } else if (INTER_PAIR_PAUSE) {
+      showPause();
+    } else {
+      showStep();
+    }
+  }
+
+  function showPause() {
+    pauseOverlay.classList.remove('hidden');
+    pauseTimeoutId = setTimeout(() => {
+      pauseTimeoutId = null;
+      pauseOverlay.classList.add('hidden');
+      showStep();
+    }, PAUSE_DURATION_MS);
+  }
+
+  document.querySelectorAll('.rating-row button').forEach(btn => {
+    btn.addEventListener('click', () => recordRating(btn.dataset.rating));
+  });
+
+  document.getElementById('abort-btn').addEventListener('click', () => finishTest());
+
+  startBtn.addEventListener('click', async () => {
+    context = {
+      timeOfDay: getRadioValue(timeField, 'tod'),
+      roomLighting: getRadioValue(lightField, 'light'),
+      photophobic: photophobic === 'yes',
+    };
+    queue = buildQueue();
+    qi = 0;
+    results.length = 0;
+
+    setupScreen.classList.add('hidden');
+    testScreen.classList.remove('hidden');
+    try {
+      await document.documentElement.requestFullscreen();
+    } catch (err) {
+      // fullscreen may be denied/unsupported — continue windowed
+    }
+    showStep();
+  });
+
+  function finishTest() {
+    if (pauseTimeoutId !== null) {
+      clearTimeout(pauseTimeoutId);
+      pauseTimeoutId = null;
+      pauseOverlay.classList.add('hidden');
+    }
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+    testScreen.classList.add('hidden');
+    resultsScreen.classList.remove('hidden');
+    renderResults();
+  }
+
+  function renderResults() {
+    const summary = document.getElementById('results-summary');
+    const total = results.length;
+    const counts = { comfortable: 0, tolerable: 0, draining: 0 };
+    results.forEach(r => counts[r.rating]++);
+    summary.textContent = total + ' ratings collected — ' +
+      counts.comfortable + ' comfortable, ' + counts.tolerable + ' tolerable, ' + counts.draining + ' draining.';
+
+    const tbody = document.querySelector('#results-table tbody');
+    tbody.innerHTML = '';
+    results.forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + r.phase + '</td>' +
+        '<td>' + r.group.replace(/^. — /, '') + '</td>' +
+        '<td>' + r.text + '</td>' +
+        '<td>' + r.background + '</td>' +
+        '<td>' + r.ipax + '</td>' +
+        '<td>' + r.fragility.toFixed(2) + ' ' + r.fragilityGrade + '</td>' +
+        '<td class="rating-' + r.rating + '">' + r.rating + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('download-btn').addEventListener('click', () => {
+    const payload = { context, results };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ipax-fragility-results-' + Date.now() + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('restart-btn').addEventListener('click', () => {
+    resultsScreen.classList.add('hidden');
+    setupScreen.classList.remove('hidden');
+  });
+
+  // keyboard shortcuts during test: 1/2/3 = comfortable/tolerable/draining
+  document.addEventListener('keydown', (e) => {
+    if (testScreen.classList.contains('hidden')) return;
+    if (pauseTimeoutId !== null && e.key !== 'Escape') return;
+    if (e.key === '1') recordRating('comfortable');
+    else if (e.key === '2') recordRating('tolerable');
+    else if (e.key === '3') recordRating('draining');
+    else if (e.key === 'Escape') finishTest();
+  });
+</script>
+</body>
+</html>
